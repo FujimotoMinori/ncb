@@ -13,8 +13,8 @@ void add2hist(/*const string& inputFile*/) {
     std::cout << "#-----start beamfitfromdata.cxx-----" << std::endl;
 
     //string finname = inputFile;
-    string finname = "/Users/fujimoto/QTtask/ncb/submitDir_5/hist-data.root";
-    string finname2 = "/Users/fujimoto/QTtask/ncb/submitDir_6/hist-data.root";
+    string finname = "/Users/fujimoto/ncb/data/user.mfujimot.testNCBwithtrig0305_ANALYSIS/output.root";
+    //string finname2 = "/Users/fujimoto/QTtask/ncb/submitDir_6/hist-data.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -24,15 +24,18 @@ void add2hist(/*const string& inputFile*/) {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
 
-    TFile* fin2 = TFile::Open(finname2.c_str(), "READ");
-    if (!fin2) {
-        cout << " input file:" << finname2.c_str() << " does not exist"<< endl;
-        return;
-    }
-    cout << " input data file:" << finname2.c_str() << " open..." << endl;
+    //TFile* fin2 = TFile::Open(finname2.c_str(), "READ");
+    //if (!fin2) {
+    //    cout << " input file:" << finname2.c_str() << " does not exist"<< endl;
+    //    return;
+    //}
+    //cout << " input data file:" << finname2.c_str() << " open..." << endl;
+
     //get histogram
-    TH1F *h1 = (TH1F*)fin->Get("mHist_charge"); 
-    TH1F *h2 = (TH1F*)fin2->Get("mHist_charge"); 
+    //TH1F *h1 = (TH1F*)fin->Get("mHist_BCMACNUItrig"); 
+    //TH1F *h2 = (TH1F*)fin->Get("mHist_BCMCANUItrig"); 
+    TH1F *h1 = (TH1F*)fin->Get("mHist_unpaired1"); 
+    TH1F *h2 = (TH1F*)fin->Get("mHist_unpaired2"); 
     h2->SetLineColor(kRed);
     //draw histogram
     TCanvas *c1 = new TCanvas("c1", "c1");
