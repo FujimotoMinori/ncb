@@ -10,11 +10,9 @@
 
 
 void add2hist(/*const string& inputFile*/) {
-    std::cout << "#-----start beamfitfromdata.cxx-----" << std::endl;
 
     //string finname = inputFile;
-    string finname = "/Users/fujimoto/QTtask/ncb/data/output0306.root";
-    //string finname2 = "/Users/fujimoto/QTtask/ncb/submitDir_6/hist-data.root";
+    string finname = "/Users/fujimoto/QTtask/ncb/data/output0405.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -32,17 +30,23 @@ void add2hist(/*const string& inputFile*/) {
     //cout << " input data file:" << finname2.c_str() << " open..." << endl;
 
     //get histogram
-    TH1F *h1 = (TH1F*)fin->Get("mHist_BCMACUItrig"); 
-    TH1F *h2 = (TH1F*)fin->Get("mHist_BCMCAUItrig"); 
-    TH1F *h3 = (TH1F*)fin->Get("mHist_BCMACNUItrig"); 
-    TH1F *h4 = (TH1F*)fin->Get("mHist_BCMCANUItrig"); 
-    TH1F *h5 = (TH1F*)fin->Get("mHist_unpaired1"); 
-    TH1F *h6 = (TH1F*)fin->Get("mHist_unpaired2"); 
+    TH1F *h1 = (TH1F*)fin->Get("mHist_NPixelsunpaired1and"); 
+    TH1F *h2 = (TH1F*)fin->Get("mHist_NPixelsunpaired16"); 
+    TH1F *h3 = (TH1F*)fin->Get("mHist_BCMACNUItrigwpv"); 
+    TH1F *h4 = (TH1F*)fin->Get("mHist_BCMCANUItrigwpv"); 
+    TH1F *h5 = (TH1F*)fin->Get("mHist_BCMACNUItrigwopv"); 
+    TH1F *h6 = (TH1F*)fin->Get("mHist_BCMCANUItrigwopv"); 
+    //TH1F *h3 = (TH1F*)fin->Get("mHist_BCMACNUItrigwopv"); 
+    //TH1F *h4 = (TH1F*)fin->Get("mHist_BCMCANUItrigwopv"); 
+    //TH1F *h5 = (TH1F*)fin->Get("mHist_unpaired1wopvorg"); 
+    //TH1F *h6 = (TH1F*)fin->Get("mHist_unpaired2wopvorg"); 
 
     h2->SetLineColor(kRed);
     //draw histogram
     TCanvas *c1 = new TCanvas("c1", "c1");
-    //h1->GetYaxis()->SetRangeUser(0,2000);
+    //h1->GetYaxis()->SetRangeUser(0,2800);
+    h1->SetTitle("NPixels");
+    h1->GetXaxis()->SetTitle("NPixels");
     h1->Draw();
     h2->Draw("sames");
     c1->Update();
@@ -57,7 +61,9 @@ void add2hist(/*const string& inputFile*/) {
     h6->SetLineColor(kRed);
     //draw histogram
     TCanvas *c2 = new TCanvas("c2", "c2");
-    //h1->GetYaxis()->SetRangeUser(0,2000);
+    h5->GetYaxis()->SetRangeUser(0,2800);
+    h5->SetTitle("BCMUI");
+    h5->GetXaxis()->SetTitle("z-asymmetry");
     h5->Draw();
     h6->Draw("sames");
     c2->Update();
@@ -72,7 +78,9 @@ void add2hist(/*const string& inputFile*/) {
     h4->SetLineColor(kRed);
     //draw histogram
     TCanvas *c3 = new TCanvas("c3", "c3");
-    //h1->GetYaxis()->SetRangeUser(0,2000);
+    h3->GetYaxis()->SetRangeUser(0,2800);
+    h3->SetTitle("BCMUI");
+    h3->GetXaxis()->SetTitle("z-asymmetry");
     h3->Draw();
     h4->Draw("sames");
     c3->Update();
@@ -84,9 +92,9 @@ void add2hist(/*const string& inputFile*/) {
     st4->SetX2NDC(0.38);
     c3->Modified();
 
-    c1->SaveAs("mHist_BCMUItrig2.pdf");
-    c2->SaveAs("mHist_unpaired2.pdf");
-    c3->SaveAs("mHist_BCMUNItrig2.pdf");
+    c1->SaveAs("mHist_BCMUItrigwoPV.pdf");
+    c2->SaveAs("mHist_unpairedwoPV.pdf");
+    c3->SaveAs("mHist_BCMUNItrigwoPV.pdf");
     
     return;
 
