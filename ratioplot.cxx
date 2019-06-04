@@ -10,7 +10,7 @@
 void ratioplot(/*const string& inputFile*/) {
 
     //string finname = inputFile;
-    string finname = "../data/merged.hist.root";
+    string finname = "../data/merged_18_3.hist.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -21,38 +21,58 @@ void ratioplot(/*const string& inputFile*/) {
     cout << " input data file:" << finname.c_str() << " open..." << endl;
 
     //get histograms
-    TH1F *h1 = (TH1F*)fin->Get("eventsAC"); 
-    TH1F *h2 = (TH1F*)fin->Get("eventsACwoPV"); 
+    TH1F *h1 = (TH1F*)fin->Get("events"); 
+    TH1F *h2 = (TH1F*)fin->Get("eventsAC"); 
+    TH1F *h3 = (TH1F*)fin->Get("eventsCA"); 
 
     //new histograms
-    TH1F *h_ratio = new TH1F("h_ratio", "; Run Number; ratio", 16340, 348150.5, 364490.5);
+    //TH1F *h_ratio = new TH1F("h_ratio", "ratio of events w/ BCM_AC_UI trig ; Run Number; ratio", 16340, 348150.5, 364490.5);
+    TH1F *h_ratio = new TH1F("h_ratio", "asymmetry of event with trigger ; Run Number; ratio", 16340, 348150.5, 364490.5);
 
     //get 
     double a,b,c;
-    //double z = 0.;
     const int n = h1->GetNbinsX()+1;
     //double x[n] = {};
     //double y[n] = {};
     for (int i=0; i< n; i++){
         double z = 0.;
+        double w = 0.;
         //x[i] = i;
         a  = h1->GetBinContent(i);
         b  = h2->GetBinContent(i);
-        if( a !=0 ) z = b/a;
-        h_ratio->SetBinContent(i,z);
-        if(i == 363910-348150) {
-            std::cout << "i= " << i << std::endl;
-            std::cout << "nEvents= " << a << std::endl;
-            std::cout << "AC= " << b << std::endl;
-            std::cout << "CA= " << c << std::endl;
-            std::cout << "z= " << z << std::endl;
+        c  = h3->GetBinContent(i);
+        if( a != 0 ) z = b/a;
+        if( a != 0 ) w = c/a;
+        //if ( z != 0 ){
+         //   h_ratio->SetBinContent(i,z);
+        //}
+        double m = 0;
+        if ( b != 0 ){
+        if ( c != 0 ){
+                m = (b-c)/(b+c);
+                std::cout << "m= " << m << std::endl;
+            if(m != 0.){
+                h_ratio->SetBinContent(i,m);
+            }
         }
+        }
+        //if(i == 363910-348150) {
+        //    std::cout << "i= " << i << std::endl;
+        //    std::cout << "nEvents= " << a << std::endl;
+        //    std::cout << "AC= " << b << std::endl;
+        //    std::cout << "CA= " << c << std::endl;
+        //    std::cout << "z= " << z << std::endl;
+        //}
         //y[i] = z;
     }
 
     TCanvas *c1 = new TCanvas("c1", "c1");
-    h_ratio->GetYaxis()->SetRangeUser(0.,1.1);
-    h_ratio->Draw("");
+    h_ratio->GetYaxis()->SetRangeUser(-1.0,1.1);
+    h_ratio->Draw("P");
+    h_ratio->SetLineColor(3); //5
+    h_ratio->SetMarkerColor(2);
+    h_ratio->SetMarkerStyle(21);
+    h_ratio->SetMarkerSize(0.3);
 
     //TGraph *gr = new TGraph(n,x,y);
     //TCanvas *c2 = new TCanvas("c2", "c2");
