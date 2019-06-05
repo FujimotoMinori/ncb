@@ -6,7 +6,8 @@ void fitslicesy() {
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
-    string finname = "../data/merged_18.hist.root";
+    //string finname = "../data/merged_18.hist.root";
+    string finname = "../data/merged_18_2_re.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -15,9 +16,9 @@ void fitslicesy() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("zasym_CA"); 
-    int first = 5000;
-    int last = 5000;
+    TH2F *hpxpy = (TH2F*)fin->Get("zasymtrack_CA"); 
+    int first = 3692;
+    int last = 3692;
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
 
     // Create a canvas and divide it
@@ -41,7 +42,7 @@ void fitslicesy() {
     // Show fitted "mean" for each slice
     leftPad->cd(2);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasym_CA_0");
+    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasymtrack_CA_0");
     hpxpy_0->Draw();
     TPad *rightPad = (TPad*)c1->cd(2);
     rightPad->Divide(1,2);
@@ -49,7 +50,7 @@ void fitslicesy() {
     gPad->SetTopMargin(0.12);
     gPad->SetLeftMargin(0.15);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasym_CA_1");
+    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasymtrack_CA_1");
     //hpxpy_1->GetYaxis()->SetRangeUser(0.0,0.3);
     hpxpy_1->Draw();
     // Show fitted "sigma" for each slice
