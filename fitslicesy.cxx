@@ -6,8 +6,9 @@ void fitslicesy() {
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
-    //string finname = "../data/merged_18.hist.root";
-    string finname = "../data/merged_18_2_re.hist.root";
+    //string finname = "../data/merged_17_0617.hist.root";
+    string finname = "../data/merged_18_0626.hist.root";
+    //string finname = "../data/PixelNCB_17.00348495.f920_m1950.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -15,10 +16,11 @@ void fitslicesy() {
         return;
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
+    //TH1F *h_meanmean = new TH1F("h_meanmean", "; ; mean", 100, -0.5, 0.5);
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("zasymtrack_CA"); 
-    int first = 3692;
-    int last = 3692;
+    TH2F *hpxpy = (TH2F*)fin->Get("zasym_CA_woSmallHits"); 
+    int first = 7501; //7501,13588
+    int last = 7501;
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
 
     // Create a canvas and divide it
@@ -42,16 +44,16 @@ void fitslicesy() {
     // Show fitted "mean" for each slice
     leftPad->cd(2);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasymtrack_CA_0");
-    hpxpy_0->Draw();
+    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasym_CA_woSmallHits_0");
+    hpxpy_0->Draw("P");
     TPad *rightPad = (TPad*)c1->cd(2);
     rightPad->Divide(1,2);
     rightPad->cd(1);
     gPad->SetTopMargin(0.12);
     gPad->SetLeftMargin(0.15);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasymtrack_CA_1");
-    //hpxpy_1->GetYaxis()->SetRangeUser(0.0,0.3);
+    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasym_CA_woSmallHits_1");
+    hpxpy_1->GetYaxis()->SetRangeUser(0.0,0.3);
     hpxpy_1->Draw();
     // Show fitted "sigma" for each slice
     rightPad->cd(2);
@@ -71,7 +73,7 @@ void fitslicesy() {
     std::cout << "rms = " << rms << std::endl;
     TF1 * f1 = new TF1("func","gaus");
     proj->SetStats(0);
-    proj->Fit("func","","",start,end);
+    //proj->Fit("func","","",start,end);
     std::cout << "meanfitted = " << f1->GetParameter(1) << std::endl;
     proj->Draw();
     //attributes

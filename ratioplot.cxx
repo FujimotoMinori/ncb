@@ -10,7 +10,7 @@
 void ratioplot(/*const string& inputFile*/) {
 
     //string finname = inputFile;
-    string finname = "../data/merged_18_3.hist.root";
+    string finname = "../data/merged_18_0616.hist.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -27,52 +27,56 @@ void ratioplot(/*const string& inputFile*/) {
 
     //new histograms
     //TH1F *h_ratio = new TH1F("h_ratio", "ratio of events w/ BCM_AC_UI trig ; Run Number; ratio", 16340, 348150.5, 364490.5);
-    TH1F *h_ratio = new TH1F("h_ratio", "asymmetry of event with trigger ; Run Number; ratio", 16340, 348150.5, 364490.5);
+    TH1F *h_ratio = new TH1F("h_asym", "asymmetry of event with trigger ; Run Number; asymmetry", 16340, 348150.5, 364490.5);
 
     //get 
     double a,b,c;
+    vector<Double_t> x,y;
     const int n = h1->GetNbinsX()+1;
-    //double x[n] = {};
-    //double y[n] = {};
     for (int i=0; i< n; i++){
         double z = 0.;
         double w = 0.;
-        //x[i] = i;
         a  = h1->GetBinContent(i);
         b  = h2->GetBinContent(i);
         c  = h3->GetBinContent(i);
+
         if( a != 0 ) z = b/a;
         if( a != 0 ) w = c/a;
-        //if ( z != 0 ){
-         //   h_ratio->SetBinContent(i,z);
-        //}
         double m = 0;
         if ( b != 0 ){
         if ( c != 0 ){
                 m = (b-c)/(b+c);
+                std::cout << "b= " << b << std::endl;
+                std::cout << "c= " << c << std::endl;
                 std::cout << "m= " << m << std::endl;
             if(m != 0.){
                 h_ratio->SetBinContent(i,m);
+                x.push_back(i);
+                y.push_back(m);
             }
         }
         }
-        //if(i == 363910-348150) {
-        //    std::cout << "i= " << i << std::endl;
-        //    std::cout << "nEvents= " << a << std::endl;
-        //    std::cout << "AC= " << b << std::endl;
-        //    std::cout << "CA= " << c << std::endl;
-        //    std::cout << "z= " << z << std::endl;
-        //}
-        //y[i] = z;
     }
+    //TH1D *proj = h_ratio->ProjectionY("projectiony"); //Projection of histograms???
+    Double_t* xpointer=&(x.at(0));
+    Double_t* ypointer=&(y.at(0));
+    TGraph* tg=new TGraph(x.size(),xpointer,ypointer);
+    tg->SetMarkerStyle(20);
+    tg->SetMarkerColor(kRed);
+    tg->SetMarkerSize(0.5);
+    TCanvas *c0 = new TCanvas("c0","c0",700,500);
+    tg->Draw("AP");
 
     TCanvas *c1 = new TCanvas("c1", "c1");
     h_ratio->GetYaxis()->SetRangeUser(-1.0,1.1);
-    h_ratio->Draw("P");
+    h_ratio->Draw("P,hist");
     h_ratio->SetLineColor(3); //5
     h_ratio->SetMarkerColor(2);
-    h_ratio->SetMarkerStyle(21);
-    h_ratio->SetMarkerSize(0.3);
+    h_ratio->SetMarkerStyle(20);
+    h_ratio->SetMarkerSize(0.5);
+    h_ratio->SetStats(0);
+    //TCanvas *c2 = new TCanvas("c2", "c2");
+    //proj->Draw();
 
     //TGraph *gr = new TGraph(n,x,y);
     //TCanvas *c2 = new TCanvas("c2", "c2");

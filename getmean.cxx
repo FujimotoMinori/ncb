@@ -6,7 +6,9 @@ void getmean() {
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
-    string finname = "../data/merged18_re.hist.root";
+    //string finname = "../data/merged18_re.hist.root";
+    //string finname = "../data/merged_18_0616.hist.root";
+    string finname = "../data/merged_17_0618.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -15,7 +17,7 @@ void getmean() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam2"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam2_woSmallHits"); 
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -28,6 +30,7 @@ void getmean() {
     gPad->SetTopMargin(0.12);
     gPad->SetFillColor(0);//33
     gPad->SetLogz();
+    hpxpy->SetStats(0);
     hpxpy->Draw("colz");
     hpxpy->GetXaxis()->SetLabelSize(0.06);
     hpxpy->GetYaxis()->SetLabelSize(0.06);
@@ -64,7 +67,7 @@ void getmean() {
         }
     }
 
-    h_mean->GetYaxis()->SetRangeUser(0,1000);
+    h_mean->GetYaxis()->SetRangeUser(420,720); //420,720
     h_mean->Draw("P");
     TPad *rightPad = (TPad*)c1->cd(2);
     rightPad->Divide(1,2);
@@ -82,8 +85,8 @@ void getmean() {
     gPad->SetLeftMargin(0.15);
     gPad->SetFillColor(0);//33
     gPad->SetLogy();
-    int first = 1117;
-    int last = 1118;
+    int first = 7501; //7501,13546
+    int last = 7501;
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
     //TH1D *proj = hpxpy->ProjectionY("projectiony",0,15797);
     proj->Draw();
