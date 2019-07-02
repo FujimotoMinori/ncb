@@ -16,8 +16,8 @@ void getasymfrommean() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_woSmallHits"); 
-    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_woSmallHits"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam2_woSmallHits"); 
+    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam2_woSmallHits"); 
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -69,8 +69,8 @@ void getasymfrommean() {
                 RMSC = pjC->GetRMS();
                 //eA = sqrt(meanA);
                 //eC = sqrt(meanC);
-                eA = 10;
-                eC = 10;
+                eA = pj->GetMeanError();
+                eC = pjC->GetMeanError();
                 cout << "meanA= "<< meanA << endl;
                 cout << "meanC= "<< meanC << endl;
                 cout << "RMSA= "<< RMSA << endl;
@@ -105,6 +105,7 @@ void getasymfrommean() {
     tg->SetMarkerStyle(20);
     tg->SetMarkerColor(kRed);
     tg->SetMarkerSize(0.5);
+    tg->GetYaxis()->SetRangeUser(0.0,0.2);
     gStyle->SetPadGridY(1);
     tg->SetTitle("asym;RunNumber;zasym");
     tg->GetXaxis()->SetLabelSize(0.03);

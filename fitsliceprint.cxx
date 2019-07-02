@@ -40,7 +40,8 @@ void fitsliceprint() {
     std::cout << "getbincontent= " << hpxpy_1->GetBinContent(13588) <<std::endl;
     hpxpy_1->Draw();
 
-    double start,end;
+    aouble start,end;
+    //第一引数はポインタ、第二引数は項目名、第三引数で表示したいattributeを指定
     double mean,rms;
     mean = proj->GetMean();
     rms = proj->GetRMS();
