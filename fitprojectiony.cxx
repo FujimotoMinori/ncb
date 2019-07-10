@@ -3,8 +3,8 @@ void fitprojectiony() {
     gStyle->SetLabelSize(0.06,"x");
     gStyle->SetLabelSize(0.06,"y");
     gStyle->SetFrameFillColor(0);//38
-    gStyle->SetTitleW(0.6);
-    gStyle->SetTitleH(0.1);
+    gStyle->SetTitleW(0.5);
+    gStyle->SetTitleH(0.08);
 
     //string finname = "../data/merged18_0608.hist.root";
     string finname = "../data/merged_18_0626.hist.root";
@@ -22,9 +22,11 @@ void fitprojectiony() {
     TH1F *h_mean2 = new TH1F("h_mean2", "; Run Number; mean", 16340, 348150.5, 364490.5);
     TH1F *h_diff = new TH1F("h_diff", "; Run Number; mean", 16340, 348150.5, 364490.5);
     const int n = hpxpy->GetNbinsX()+1;
-    std::cout << "n=" << n << std::endl;
+    //std::cout << "n=" << n << std::endl;
     vector<Double_t> x,y;
+    int bi = 0;
     for (int i=0; i< n; i++){
+        bi = i+348150;
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
         TH1D *pj2 = hpxpy2->ProjectionY("projectiony2",i,i);
         int num = 0;
@@ -40,14 +42,12 @@ void fitprojectiony() {
         int first2,last2;
         mean = pj->GetMean();
         mean2 = pj2->GetMean();
-        //std::cout << "mean1=" << mean << std::endl;
-        //std::cout << "sigma=" << sigma << std::endl;
         sigma = pj->GetRMS();
         sigma2 = pj2->GetRMS();
         if(mean != 0.0) {
         if(mean2 != 0.0) {
-                std::cout << "mean1=" << mean << std::endl;
-                std::cout << "mean2=" << mean2<< std::endl;
+                //std::cout << "mean1=" << mean << std::endl;
+                //std::cout << "mean2=" << mean2<< std::endl;
                 first = mean-sigma; 
                 last = mean+sigma; 
                 first2 = mean2-sigma2; 
@@ -60,15 +60,15 @@ void fitprojectiony() {
                 getmean2 = f2->GetParameter(1);
                 chi2 = f1->GetChisquare();
                 ndof = f1->GetNDF();
-                std::cout << "mean=" << getmean << std::endl;
-                std::cout << "chi2= " << chi2 << std::endl;
-                std::cout << "NDF= " << ndof << std::endl;
-                std::cout << "chi2/NDF= " << chi2/ndof << std::endl;
+                //std::cout << "mean=" << getmean << std::endl;
+                //std::cout << "chi2= " << chi2 << std::endl;
+                //std::cout << "NDF= " << ndof << std::endl;
+                //std::cout << "chi2/NDF= " << chi2/ndof << std::endl;
 
                 if (getmean != 0.0)  h_mean->SetBinContent(i,getmean);
                 if (getmean2 != 0.0)  h_mean2->SetBinContent(i,getmean2);
                 h_diff->SetBinContent(i,abs(getmean)-abs(getmean2));
-                x.push_back(i);
+                x.push_back(bi);
                 y.push_back(abs(getmean)-abs(getmean2));
         }
         }
@@ -81,7 +81,7 @@ void fitprojectiony() {
     tg->SetMarkerSize(0.5);
     gStyle->SetPadGridY(1);
     //tg->GetYaxis()->SetRangeUser();
-    tg->SetTitle("abs(asymAC)-abs(asymCA);RunNumber;zasym");
+    tg->SetTitle("abs(asymAC)-abs(asymCA);RunNumber;difference of zasym");
     tg->GetXaxis()->SetLabelSize(0.03);
     tg->GetYaxis()->SetLabelSize(0.03);
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
