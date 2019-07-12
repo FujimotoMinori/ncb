@@ -45,7 +45,9 @@ void getasymfrommean() {
 
     vector<Double_t> x,y,xe,ye;
     const int n = hpxpy->GetNbinsX()+1;
+    int bi = 0;
     for (int i=0; i< n; i++){
+        bi = i+ 348150.0;
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
         TH1D *pjC = hpxpyC->ProjectionY("projectionyC",i,i);
         int num = 0;
@@ -71,24 +73,23 @@ void getasymfrommean() {
                 //eC = sqrt(meanC);
                 eA = pj->GetMeanError();
                 eC = pjC->GetMeanError();
-                cout << "meanA= "<< meanA << endl;
-                cout << "meanC= "<< meanC << endl;
-                cout << "RMSA= "<< RMSA << endl;
-                cout << "RMSC= "<< RMSC << endl;
-                cout << "eA= "<< eA << endl;
-                cout << "eC= "<< eC << endl;
+                //cout << "meanA= "<< meanA << endl;
+                //cout << "meanC= "<< meanC << endl;
+                //cout << "RMSA= "<< RMSA << endl;
+                //cout << "RMSC= "<< RMSC << endl;
+                //cout << "eA= "<< eA << endl;
+                //cout << "eC= "<< eC << endl;
 
                 if((meanA + meanC) != 0) {
                     zasym = (meanA-meanC)/(meanA+meanC); 
                     denom = 2/((meanA+meanC)*(meanA+meanC));   
                     ezasym = sqrt(meanC*meanC*eA*eA+meanA*meanA*eC*eC)*denom;  
                     h_meannew->SetBinContent(i,zasym);
-                    x.push_back(i);
+                    x.push_back(bi);
                     y.push_back(zasym);
-                    cout << "asym= "<< zasym << endl;
-                    cout << "easym= "<< ezasym << endl;
+                    //cout << "asym= "<< zasym << endl;
+                    //cout << "easym= "<< ezasym << endl;
                     xe.push_back(0.);
-                    //ye.push_back(ezasym);
                     ye.push_back(ezasym);
                 }
 
