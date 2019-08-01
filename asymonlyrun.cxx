@@ -21,8 +21,6 @@ int asymonlyrun() {
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
 
     //get runsummary
-    //map of run and # of bunches
-    std::map<int,int> pattern;
     TString ifndata = "a.txt";
     //first read datasummary file
     fstream findata;
@@ -36,33 +34,16 @@ int asymonlyrun() {
     const int n_Run = 1000;
     const int n_Colliding = 1000;
     int a,b;
-    //int runF[n_Run] = {};
-    //int collidingF[n_Colliding] = {};
-    int n = 0;
+    std::map<int,int> pattern;
 
     while(getline(findata,strdata))
     {
         if(strdata[0] == '#') continue;
-        n++;
         a = 0;
         b = 0;
         sscanf(strdata.data(), "%d,%d", &a, &b);
-        //runF[n] = a;
-        //collidingF[n] = b;
         pattern.insert(make_pair(a,b));
     }
-
-    auto begin = pattern.begin(), end = pattern.end();
-    for (auto iter = begin; iter != end; iter++) {
-        //if(iter->second == 7){
-            std::cout << "run= " << iter->first << " colliding= " << iter->second << std::endl;
-            //if(iter->first>=100) ++ntrackA;
-            //else ++ntrackC;
-        //}
-    }
-    pattern.clear();
-
-    return 0;
 
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
     c1->SetFillColor(0);//42
@@ -121,5 +102,7 @@ int asymonlyrun() {
     c1->Print("originalzasym.pdf");
     c3->Print("fitmean.pdf");
     c4->Print("gaussian.pdf");
+
+    return 0;
 }
 

@@ -15,11 +15,11 @@ void getmeandiff() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_wSmallHits"); 
-    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_wSmallHits"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_woSmallHits"); 
+    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_woSmallHits"); 
 
-    TH2F *hpxpy2 = (TH2F*)fin->Get("nHitsA_beam2_wSmallHits"); 
-    TH2F *hpxpyC2 = (TH2F*)fin->Get("nHitsC_beam2_wSmallHits"); 
+    TH2F *hpxpy2 = (TH2F*)fin->Get("nHitsA_beam2_woSmallHits"); 
+    TH2F *hpxpyC2 = (TH2F*)fin->Get("nHitsC_beam2_woSmallHits"); 
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -72,7 +72,7 @@ void getmeandiff() {
             meanCA = pj2->GetMean() + pjc2->GetMean();
             errorAC = pow(pj->GetMeanError(),2) + pow(pjc->GetMeanError(),2);
             errorCA = pow(pj2->GetMeanError(),2) + pow(pjc2->GetMeanError(),2);
-            yd.push_back(meanAC-meanCA);
+            yd.push_back((meanAC-meanCA)/(meanAC+meanCA));
             xe.push_back(0.);
             xec.push_back(0.);
             xed.push_back(0.);
@@ -158,11 +158,11 @@ void getmeandiff() {
 
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
     tg->Draw("AP");
-    c0->Print("testA.pdf");
+    //c0->Print("testA.pdf");
     TCanvas *c4 = new TCanvas("c4","c4",700,500);
     tgc->Draw("AP");
-    c4->Print("testC.pdf");
+    //c4->Print("testC.pdf");
     TCanvas *c5 = new TCanvas("c5","c5",700,500);
     tgd->Draw("AP");
-    c5->Print("testdiff.pdf");
+    //c5->Print("testdiff.pdf");
 }

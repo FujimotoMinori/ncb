@@ -1,10 +1,10 @@
 int getmeanonlyrun() {
     // Change some default parameters in the current style
-    gStyle->SetLabelSize(0.06,"x");
-    gStyle->SetLabelSize(0.06,"y");
+    gStyle->SetLabelSize(0.04,"x");
+    gStyle->SetLabelSize(0.04,"y");
     gStyle->SetFrameFillColor(0);//38
-    gStyle->SetTitleW(0.6);
-    gStyle->SetTitleH(0.1);
+    gStyle->SetTitleW(0.5);
+    gStyle->SetTitleH(0.08);
 
     string finname = "../data/merged_18_0626.hist.root";
     //file open
@@ -15,8 +15,8 @@ int getmeanonlyrun() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_woSmallHits"); 
-    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_woSmallHits"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1"); 
+    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_wSmallHits"); 
 
     //get runsummary
     TString ifndata = "a.txt";
@@ -55,8 +55,8 @@ int getmeanonlyrun() {
     gPad->SetLogz();
     hpxpy->SetStats(0);
     hpxpy->Draw("colz");
-    hpxpy->GetXaxis()->SetLabelSize(0.06);
-    hpxpy->GetYaxis()->SetLabelSize(0.06);
+    hpxpy->GetXaxis()->SetLabelSize(0.04);
+    hpxpy->GetYaxis()->SetLabelSize(0.04);
     hpxpy->SetMarkerColor(kYellow);
     leftPad->cd(2);
     gPad->SetFillColor(0);
@@ -69,7 +69,7 @@ int getmeanonlyrun() {
     const int n = hpxpy->GetNbinsX()+1;
     float bi = 0;
 
-    for (int i=0; i< n; i++){//bin loop
+    for (int i=0; i < n; i++){//bin loop
         bool bingo = false;
         bi = i + 348150.0;   
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
@@ -77,12 +77,14 @@ int getmeanonlyrun() {
         int num = 0;
         int flag = 0;
         num = pj->GetBinContent(i);
-        if(pj->GetMean() != 0.0) {
+        if (pj->GetMean() != 0.0) {
+            if(pj->GetMean() > 0.5){
+                //cout << "i=" << i << endl;
 
             auto itr = pattern.find(bi);
             if( itr != pattern.end() ) {
                 flag = itr->second;
-                if(flag == 2544){
+                if(flag != 2544){
                     bingo = true;
                 }
             }
@@ -105,6 +107,7 @@ int getmeanonlyrun() {
                 yec.push_back(0.);
             }
 
+        }
         }
     }//end of bin loop
 
@@ -148,9 +151,10 @@ int getmeanonlyrun() {
     gPad->SetLeftMargin(0.15);
     gPad->SetFillColor(0);//33
     gPad->SetLogy();
-    int first = 7501; //7501,13546
-    int last = 7501;
+    int first = 14054; //7501,14054,13546
+    int last = 14054;
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
+    proj->Rebin(10);//20
     proj->Draw("e");
     float error = 0;
     proj->GetMeanError(first);
@@ -166,10 +170,13 @@ int getmeanonlyrun() {
 
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
     tg->Draw("AP");
-    c0->Print("testA.pdf");
+    //c0->Print("testA.pdf");
     TCanvas *c4 = new TCanvas("c4","c4",700,500);
     tgc->Draw("AP");
-    c4->Print("testC.pdf");
+    //c4->Print("testC.pdf");
+    TCanvas *c6 = new TCanvas("c6","c6",700,500);
+    gPad->SetLogy();
+    proj->Draw();
 
     return 0;
 }

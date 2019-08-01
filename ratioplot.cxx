@@ -10,7 +10,7 @@
 void ratioplot(/*const string& inputFile*/) {
 
     //string finname = inputFile;
-    string finname = "../data/merged_18_0616.hist.root";
+    string finname = "../data/merged_18_0626.hist.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -33,7 +33,9 @@ void ratioplot(/*const string& inputFile*/) {
     double a,b,c;
     vector<Double_t> x,y;
     const int n = h1->GetNbinsX()+1;
+    int bi = 0;
     for (int i=0; i< n; i++){
+        bi = i+348150.0;
         double z = 0.;
         double w = 0.;
         a  = h1->GetBinContent(i);
@@ -45,15 +47,14 @@ void ratioplot(/*const string& inputFile*/) {
         double m = 0;
         if ( b != 0 ){
         if ( c != 0 ){
-                m = (b-c)/(b+c);
-                std::cout << "b= " << b << std::endl;
-                std::cout << "c= " << c << std::endl;
-                std::cout << "m= " << m << std::endl;
-            if(m != 0.){
+                //m = (b-c)/(b+c);
+                m = b-c;
+                if(a !=0) m = m/a;
+            //if(m != 0.){
                 h_ratio->SetBinContent(i,m);
-                x.push_back(i);
+                x.push_back(bi);
                 y.push_back(m);
-            }
+            //}
         }
         }
     }
@@ -61,9 +62,17 @@ void ratioplot(/*const string& inputFile*/) {
     Double_t* xpointer=&(x.at(0));
     Double_t* ypointer=&(y.at(0));
     TGraph* tg=new TGraph(x.size(),xpointer,ypointer);
+    //tg->SetTitle("(trig(AC)-trig(CA))/(trig(AC)+trig(AC))");
+    tg->SetTitle("trig(AC)-trig(CA)");
+    tg->GetXaxis()->SetTitle("runNumber");
+    tg->GetYaxis()->SetTitle("difference of number of triggers");
+    tg->GetYaxis()->SetTitleOffset(1.3);
+    //tg->GetYaxis()->SetRangeUser(-70000,70000);
+    tg->GetYaxis()->SetRangeUser(-5.0,5.0);
     tg->SetMarkerStyle(20);
     tg->SetMarkerColor(kRed);
     tg->SetMarkerSize(0.5);
+    gStyle->SetPadGridY(1);
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
     tg->Draw("AP");
 

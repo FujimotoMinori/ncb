@@ -1,9 +1,9 @@
 void fitprojectiony() {
     // Change some default parameters in the current style
-    gStyle->SetLabelSize(0.06,"x");
-    gStyle->SetLabelSize(0.06,"y");
+    gStyle->SetLabelSize(0.03,"x");
+    gStyle->SetLabelSize(0.03,"y");
     gStyle->SetFrameFillColor(0);//38
-    gStyle->SetTitleW(0.5);
+    gStyle->SetTitleW(0.4);
     gStyle->SetTitleH(0.08);
 
     //string finname = "../data/merged18_0608.hist.root";
@@ -15,6 +15,32 @@ void fitprojectiony() {
         return;
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
+
+    //get runsummary
+    TString ifndata = "a.txt";
+    //first read datasummary file
+    fstream findata;
+    std::string strdata;
+    findata.open(ifndata);
+    if(findata.fail()){
+        cerr << "cannot open datasummary file : " << ifndata << std::endl;
+        return;
+    }
+    //read file
+    const int n_Run = 1000;
+    const int n_Colliding = 1000;
+    int a,b;
+    std::map<int,int> pattern;
+
+    while(getline(findata,strdata))
+    {
+        if(strdata[0] == '#') continue;
+        a = 0;
+        b = 0;
+        sscanf(strdata.data(), "%d,%d", &a, &b);
+        pattern.insert(make_pair(a,b));
+    }
+
     //get histograms
     TH2F *hpxpy = (TH2F*)fin->Get("zasym_AC_woSmallHits"); 
     TH2F *hpxpy2 = (TH2F*)fin->Get("zasym_CA_woSmallHits"); 
@@ -22,20 +48,24 @@ void fitprojectiony() {
     TH1F *h_mean2 = new TH1F("h_mean2", "; Run Number; mean", 16340, 348150.5, 364490.5);
     TH1F *h_diff = new TH1F("h_diff", "; Run Number; mean", 16340, 348150.5, 364490.5);
     const int n = hpxpy->GetNbinsX()+1;
-    //std::cout << "n=" << n << std::endl;
     vector<Double_t> x,y;
+    vector<Double_t> xf,yf,xfe,yfe;
     int bi = 0;
     for (int i=0; i< n; i++){
+        bool bingo = false;
         bi = i+348150;
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
         TH1D *pj2 = hpxpy2->ProjectionY("projectiony2",i,i);
         int num = 0;
+        int flag = 0;
         double mean = 0.;
         double mean2 = 0.;
         double sigma = 0.;
         double sigma2 = 0.;
         double getmean = 0.;
         double getmean2 = 0.;
+        double getmeanerr = 0.;
+        double getmean2err = 0.;
         double chi2 = 0.;
         double ndof = 0.;
         int first,last;
@@ -45,9 +75,7 @@ void fitprojectiony() {
         sigma = pj->GetRMS();
         sigma2 = pj2->GetRMS();
         if(mean != 0.0) {
-        if(mean2 != 0.0) {
-                //std::cout << "mean1=" << mean << std::endl;
-                //std::cout << "mean2=" << mean2<< std::endl;
+            if(mean2 != 0.0) {
                 first = mean-sigma; 
                 last = mean+sigma; 
                 first2 = mean2-sigma2; 
@@ -58,19 +86,36 @@ void fitprojectiony() {
                 pj2->Fit("func2","","",first2,last2);
                 getmean = f1->GetParameter(1);
                 getmean2 = f2->GetParameter(1);
+                getmeanerr = f1->GetParError(1);
+                getmean2err = f2->GetParError(1);
                 chi2 = f1->GetChisquare();
                 ndof = f1->GetNDF();
-                //std::cout << "mean=" << getmean << std::endl;
-                //std::cout << "chi2= " << chi2 << std::endl;
-                //std::cout << "NDF= " << ndof << std::endl;
-                //std::cout << "chi2/NDF= " << chi2/ndof << std::endl;
+
 
                 if (getmean != 0.0)  h_mean->SetBinContent(i,getmean);
                 if (getmean2 != 0.0)  h_mean2->SetBinContent(i,getmean2);
                 h_diff->SetBinContent(i,abs(getmean)-abs(getmean2));
+
+                auto itr = pattern.find(bi);
+                if( itr != pattern.end() ) {
+                    flag = itr->second;
+                    if(flag != 2544){
+                        bingo = true;
+                    }
+                }
+
                 x.push_back(bi);
                 y.push_back(abs(getmean)-abs(getmean2));
-        }
+                xf.push_back(bi);
+                xfe.push_back(0.);
+                if(bingo){
+                    yf.push_back(getmean2);
+                    yfe.push_back(getmean2err);
+                }else{
+                    yf.push_back(-1.);
+                    yfe.push_back(0.);
+                }
+            }
         }
     }
     Double_t* xpointer=&(x.at(0));
@@ -86,8 +131,21 @@ void fitprojectiony() {
     tg->GetYaxis()->SetLabelSize(0.03);
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
     tg->Draw("AP");
-    
 
+
+    Double_t* xpointerf=&(xf.at(0));
+    Double_t* ypointerf=&(yf.at(0));
+    Double_t* xpointerfe=&(xfe.at(0));
+    Double_t* ypointerfe=&(yfe.at(0));
+    TGraphErrors* tgf=new TGraphErrors(xf.size(),xpointerf,ypointerf,xpointerfe,ypointerfe);
+    tgf->SetMarkerStyle(20);
+    tgf->SetMarkerColor(kRed);
+    tgf->SetMarkerSize(0.5);
+    gStyle->SetPadGridY(1);
+    tgf->SetTitle("fitted mean of z-asymmetry;RunNumber;");
+    tgf->GetXaxis()->SetLabelSize(0.04);
+    tgf->GetYaxis()->SetLabelSize(0.04);
+    tgf->GetYaxis()->SetRangeUser(0.0,0.3);
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -101,8 +159,8 @@ void fitprojectiony() {
     gPad->SetFillColor(0);//33
     gPad->SetLogz();
     hpxpy->Draw("colz");
-    hpxpy->GetXaxis()->SetLabelSize(0.06);
-    hpxpy->GetYaxis()->SetLabelSize(0.06);
+    hpxpy->GetXaxis()->SetLabelSize(0.03);
+    hpxpy->GetYaxis()->SetLabelSize(0.03);
     hpxpy->SetMarkerColor(kYellow);
     // Fit slices projected along Y fron bins in X [7,32] with more than 20 bins  in Y filled
     //hpxpy->FitSlicesY(0,7,32,20);
@@ -143,12 +201,6 @@ void fitprojectiony() {
     //proj->Draw();
     h_mean->GetYaxis()->SetRangeUser(-0.3,0.0);
     h_mean->Draw("P");
-    TCanvas *c2 = new TCanvas("c2","c2",700,500);
-    h_mean2->Draw("P");
-    TCanvas *c3 = new TCanvas("c3","c3",700,500);
-    h_mean->Draw("P");
-    TCanvas *c4 = new TCanvas("c4","c4",700,500);
-    h_diff->Draw("P");
 
 
     //attributes
@@ -176,4 +228,13 @@ void fitprojectiony() {
     h_diff->SetMarkerColor(2);
     h_diff->SetMarkerStyle(21);
     h_diff->SetMarkerSize(0.3);
+
+    TCanvas *c2 = new TCanvas("c2","c2",700,500);
+    h_mean2->Draw("P");
+    TCanvas *c3 = new TCanvas("c3","c3",700,500);
+    h_mean->Draw("P");
+    TCanvas *c4 = new TCanvas("c4","c4",700,500);
+    h_diff->Draw("P");
+    TCanvas *c5 = new TCanvas("c5","c5",700,500);
+    tgf->Draw("AP");
 }

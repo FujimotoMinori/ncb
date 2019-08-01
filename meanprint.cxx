@@ -1,14 +1,14 @@
 void meanprint() {
     // Change some default parameters in the current style
-    gStyle->SetLabelSize(0.06,"x");
-    gStyle->SetLabelSize(0.06,"y");
+    gStyle->SetLabelSize(0.03,"x");
+    gStyle->SetLabelSize(0.03,"y");
     gStyle->SetFrameFillColor(0);//38
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
     //string finname = "../data/merged18_re.hist.root";
     //string finname = "../data/merged_18_0616.hist.root";
-    string finname = "../data/merged_17_0618.hist.root";
+    string finname = "../data/merged_18_0712.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -17,7 +17,7 @@ void meanprint() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsC_beam2_woSmallHits"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nTrackA_beam2"); 
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -31,9 +31,10 @@ void meanprint() {
     gPad->SetFillColor(0);//33
     gPad->SetLogz();
     hpxpy->SetStats(0);
+    const Int_t NRGBs = 5; const Int_t NCont = 255;Double_t stops[NRGBs] = { 0.00, 0.34, 0.61, 0.84, 1.00 };Double_t Red[NRGBs] = { 0.00, 0.00, 0.87, 1.00, 0.51 }; Double_t Green[NRGBs] = { 0.00, 0.81, 1.00, 0.20, 0.00 };Double_t Blue[NRGBs] = { 0.51, 1.00, 0.12, 0.00, 0.00 }; TColor::CreateGradientColorTable(NRGBs, stops, Red, Green, Blue, NCont);gStyle->SetNumberContours(NCont); 
     hpxpy->Draw("colz");
-    hpxpy->GetXaxis()->SetLabelSize(0.06);
-    hpxpy->GetYaxis()->SetLabelSize(0.06);
+    hpxpy->GetXaxis()->SetLabelSize(0.03);
+    hpxpy->GetYaxis()->SetLabelSize(0.03);
     //hpxpy->SetMarkerColor(kYellow);
     // Fit slices projected along Y fron bins in X [7,32] with more than 20 bins  in Y filled
     //hpxpy->FitSlicesY(0,7,32,20);
