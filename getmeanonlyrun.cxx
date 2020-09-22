@@ -15,8 +15,8 @@ int getmeanonlyrun() {
     }
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1"); 
-    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_wSmallHits"); 
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_woSmallHits"); 
+    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_woSmallHits"); 
 
     //get runsummary
     TString ifndata = "a.txt";
@@ -64,12 +64,25 @@ int getmeanonlyrun() {
 
     TH1F *h_mean = new TH1F("h_mean", "; Run Number; mean", 16340, 348150.5, 364490.5);
     TH1F *h_meanmean = new TH1F("h_meanmean", "; Run Number; mean", 100, 0, 1000);
+    TH1F *h_meanmeanc = new TH1F("h_meanmeanc", "; Run Number; mean", 100, 0, 1000);
     vector<Double_t> x,y,xe,ye;
     vector<Double_t> xc,yc,xec,yec;
     const int n = hpxpy->GetNbinsX()+1;
     float bi = 0;
 
+    float sigma2 = 0.;
+    float sigma2x = 0.;
+    float sigma2c = 0.;
+    float sigma2xc = 0.;
+    float mean = 0.;
+    float meanc = 0.;
+    float sigma = 0.;
+    float sigmac = 0.;
     for (int i=0; i < n; i++){//bin loop
+        float meanx = 0.;
+        float sigmax = 0.;
+        float meanxc = 0.;
+        float sigmaxc = 0.;
         bool bingo = false;
         bi = i + 348150.0;   
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
@@ -94,12 +107,22 @@ int getmeanonlyrun() {
             xc.push_back(bi);
             xe.push_back(0.);
             xec.push_back(0.);
-            h_meanmean->Fill(pj->GetMean());
+            //h_meanmean->Fill(pj->GetMean());
             if(bingo){
+                h_meanmean->Fill(pj->GetMean());
+                h_meanmeanc->Fill(pjc->GetMean());
                 y.push_back(pj->GetMean());
                 yc.push_back(pjc->GetMean());
                 ye.push_back(pj->GetMeanError());
                 yec.push_back(pjc->GetMeanError());
+                meanx = pj->GetMean();
+                sigmax = pj->GetMeanError();
+                sigma2 += 1/(sigmax*sigmax);
+                sigma2x += meanx/(sigmax*sigmax);
+                meanxc = pjc->GetMean();
+                sigmaxc = pjc->GetMeanError();
+                sigma2c += 1/(sigmaxc*sigmaxc);
+                sigma2xc += meanxc/(sigmaxc*sigmaxc);
             }else{
                 y.push_back(0.);
                 yc.push_back(0.);
@@ -110,6 +133,18 @@ int getmeanonlyrun() {
         }
         }
     }//end of bin loop
+    mean = sigma2x/sigma2;
+    sigma = sqrt(1/sigma2); 
+    meanc = sigma2xc/sigma2c;
+    sigmac = sqrt(1/sigma2c); 
+    cout << "mean = " << mean <<endl;
+    cout << "sigma = " << sigma <<endl;
+    cout << "meanc = " << meanc <<endl;
+    cout << "sigmac = " << sigmac <<endl;
+    cout << "meanrun = " << h_meanmean->GetMean() <<endl;
+    cout << "sigmarun = " << h_meanmean->GetMeanError() <<endl;
+    cout << "meanrunc = " << h_meanmeanc->GetMean() <<endl;
+    cout << "sigmarunc = " << h_meanmeanc->GetMeanError() <<endl;
 
     Double_t* xpointer=&(x.at(0));
     Double_t* ypointer=&(y.at(0));
@@ -136,6 +171,8 @@ int getmeanonlyrun() {
     tgc->SetTitle(";RunNumber;mean of NHits");
     tgc->GetXaxis()->SetLabelSize(0.03);
     tgc->GetYaxis()->SetLabelSize(0.03);
+    //tg->Fit("pol1","","",348494,364293);
+    //tgc->Fit("pol1","","",348494,364293);
 
     h_mean->GetYaxis()->SetRangeUser(420,720); //420,720
     h_mean->Draw("P");

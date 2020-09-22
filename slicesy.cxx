@@ -1,4 +1,4 @@
-void fitslicesy() {
+void slicesy() {
     // Change some default parameters in the current style
     gStyle->SetLabelSize(0.06,"x");
     gStyle->SetLabelSize(0.06,"y");
@@ -6,8 +6,8 @@ void fitslicesy() {
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
-    //string finname = "../data/merged_18_0626.hist.root";
-    string finname = "../data/output349011.root";
+    string finname = "../data/merged_18_0626.hist.root";
+
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -17,10 +17,9 @@ void fitslicesy() {
     cout << " input data file:" << finname.c_str() << " open..." << endl;
     //TH1F *h_meanmean = new TH1F("h_meanmean", "; ; mean", 100, -0.5, 0.5);
     //get histograms
-    //TH2F *hpxpy = (TH2F*)fin->Get("zasym_CA_woSmallHits"); 
-    TH2F *hpxpy = (TH2F*)fin->Get("zasym_CA_bcid"); 
-    int first = 7501; //7501,13588
-    int last = 7501;
+    TH2F *hpxpy = (TH2F*)fin->Get("zasym_AC"); 
+    int first = 13588;
+    int last = 13588;
     TH1D *proj = hpxpy->ProjectionY("projectiony",first,last);
 
     // Create a canvas and divide it
@@ -38,22 +37,28 @@ void fitslicesy() {
     hpxpy->GetXaxis()->SetLabelSize(0.06);
     hpxpy->GetYaxis()->SetLabelSize(0.06);
     hpxpy->SetMarkerColor(kYellow);
-    // Fit slices projected along Y fron bins in X [7,32] with more than 20 bins  in Y filled
-    //hpxpy->FitSlicesY(0,7,32,20);
+
+     
+
+
+
+
+    
     hpxpy->FitSlicesY();
     // Show fitted "mean" for each slice
     leftPad->cd(2);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasym_CA_bcid_0");
-    hpxpy_0->Draw("P");
+    TH2F *hpxpy_0 = (TH2F*)fin->Get("zasym_AC_2");
+    hpxpy_0->GetYaxis()->SetRangeUser(0.,0.3);
+    hpxpy_0->Draw();
     TPad *rightPad = (TPad*)c1->cd(2);
     rightPad->Divide(1,2);
     rightPad->cd(1);
     gPad->SetTopMargin(0.12);
     gPad->SetLeftMargin(0.15);
     gPad->SetFillColor(0);
-    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasym_CA_bcid_1");
-    hpxpy_1->GetYaxis()->SetRangeUser(0.0,0.3);
+    TH2F *hpxpy_1 = (TH2F*)fin->Get("zasym_AC_1");
+    hpxpy_1->GetYaxis()->SetRangeUser(0.,0.3);
     hpxpy_1->Draw();
     // Show fitted "sigma" for each slice
     rightPad->cd(2);

@@ -6,8 +6,8 @@ void fitprojectiony() {
     gStyle->SetTitleW(0.4);
     gStyle->SetTitleH(0.08);
 
-    //string finname = "../data/merged18_0608.hist.root";
-    string finname = "../data/merged_18_0626.hist.root";
+    //string finname = "../data/merged18_0905.hist.root";
+    string finname = "../data/merged_18_1023.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -129,6 +129,7 @@ void fitprojectiony() {
     tg->SetTitle("abs(asymAC)-abs(asymCA);RunNumber;difference of zasym");
     tg->GetXaxis()->SetLabelSize(0.03);
     tg->GetYaxis()->SetLabelSize(0.03);
+    tg->GetYaxis()->SetRangeUser(-0.2,0.2);
     TCanvas *c0 = new TCanvas("c0","c0",700,500);
     tg->Draw("AP");
 
@@ -165,6 +166,8 @@ void fitprojectiony() {
     // Fit slices projected along Y fron bins in X [7,32] with more than 20 bins  in Y filled
     //hpxpy->FitSlicesY(0,7,32,20);
     hpxpy->FitSlicesY();
+
+    cout << "xsize=" << xf.size() << endl;
 
     // Show fitted "mean" for each slice
     leftPad->cd(2); //secondcanvas

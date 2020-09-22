@@ -6,7 +6,7 @@ void getmeandiff() {
     gStyle->SetTitleW(0.6);
     gStyle->SetTitleH(0.1);
 
-    string finname = "../data/merged_18_0626.hist.root";
+    string finname = "../data/merged_18_0808.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {

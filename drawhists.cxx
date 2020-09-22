@@ -12,7 +12,8 @@
 void drawhists(/*const string& inputFile*/) {
 
     //string finname = inputFile;
-    string finname = "../data/output0804.root";
+    //string finname = "../data/output0828.root";
+    string finname = "../data/output0906.root";
 
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
@@ -34,7 +35,21 @@ void drawhists(/*const string& inputFile*/) {
     TH1F *h2 = (TH1F*)fin->Get("hits3"); 
     TH1F *h3 = (TH1F*)fin->Get("hits6"); 
     TH1F *h4 = (TH1F*)fin->Get("woSmallHits"); 
-    TH1F *h5 = (TH1F*)fin->Get("ECA_beam1");
+    //TH1F *h5 = (TH1F*)fin->Get("cut");
+    TH1F *h6 = (TH1F*)fin->Get("wSmallHits");
+    TH1F *h7 = (TH1F*)fin->Get("noiseC");
+
+    int enoise = 0;
+    int anoise = 0;
+    cout << "nEntries= " << h6->GetEntries() << endl;
+    for(int i = 0;i< h6->GetEntries();i++){
+        //cout << "i= " << i << endl;
+        anoise += h6->GetBinContent(i);
+        enoise += h7->GetBinContent(i);
+    }
+    cout << "allnoise= " << anoise << endl;
+    cout << "electricnoise= " << enoise << endl;
+    cout << "ratio= " << anoise/enoise << endl;
 
     h1->SetLineColor(kGreen);
     //draw histogram
@@ -42,6 +57,9 @@ void drawhists(/*const string& inputFile*/) {
     //h1->SetTitle("NPixels");
     //h1->GetXaxis()->SetTitle("NPixels");
     h1->Draw();
+    //h5->SetLineColor(20);
+    //h5->Draw("sames");
+    c1->Update();
     h2->SetLineColor(kRed);
     h2->Draw("sames");
     c1->Update();
@@ -49,9 +67,6 @@ void drawhists(/*const string& inputFile*/) {
     h4->Draw("sames");
     h3->SetLineColor(kBlue);
     h3->Draw("sames");
-    c1->Update();
-    h5->SetLineColor(kPink);
-    h5->Draw("sames");
     c1->Update();
 
     TPaveStats *st1 = (TPaveStats*)h1->FindObject("stats");
@@ -66,12 +81,14 @@ void drawhists(/*const string& inputFile*/) {
     c1->Modified();
     st3->SetTextColor(kBlue);
     c1->Modified();
-    TPaveStats *st5 = (TPaveStats*)h5->FindObject("stats");
-    st5->SetTextColor(kPink);
-    c1->Modified();
+    //TPaveStats *st5 = (TPaveStats*)h5->FindObject("stats");
+    //st5->SetTextColor(20);
+    //c1->Modified();
 
 
     //c1->SaveAs("test0804.pdf");
+    TCanvas *c2 = new TCanvas("c2", "c2");
+    h6->Draw();
     
     return;
 
