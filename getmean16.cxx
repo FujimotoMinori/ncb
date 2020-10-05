@@ -1,4 +1,4 @@
-void getmean17() {
+void getmean16() {
     // Change some default parameters in the current style
     gStyle->SetLabelSize(0.045,"x");
     gStyle->SetLabelSize(0.045,"y");
@@ -8,7 +8,7 @@ void getmean17() {
     gStyle->SetTitleOffset(1.3,"x");
     gStyle->SetTitleOffset(1.3,"y");
 
-    string finname = "../data/merged_17_4.root";
+    string finname = "../data/merged_16_4.hist.root";
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -18,16 +18,17 @@ void getmean17() {
     cout << " input data file:" << finname.c_str() << " open..." << endl;
 
     //get histograms
-    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1_woSmallHits"); 
-    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1_woSmallHits"); 
-
-    TCanvas *c0 = new TCanvas("c0","c0",700,500);
-    hpxpy->Draw("colz");
-
+    TH2F *hpxpy = (TH2F*)fin->Get("nHitsA_beam1"); 
+    TH2F *hpxpyC = (TH2F*)fin->Get("nHitsC_beam1"); 
 
     // Create a canvas and divide it
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
     c1->SetFillColor(0);//42
+    //c1->Divide(2,1);
+    //TPad *leftPad = (TPad*)c1->cd(1);;
+    //leftPad->Divide(1,2);
+    // Draw 2-d original histogram
+    //leftPad->cd(1);
     gPad->SetTopMargin(0.12);
     gPad->SetFillColor(0);//33
     gPad->SetLogz();
@@ -45,43 +46,41 @@ void getmean17() {
     hpxpy->GetYaxis()->SetRangeUser(0.,5000);//5000
     hpxpy->GetZaxis()->SetRangeUser(0.,1000);
     hpxpy->SetMarkerColor(kYellow);
+    // Show fitted "mean" for each slice
+    //leftPad->cd(2);
+    //gPad->SetFillColor(0);
+    //TCanvas *c9 = new TCanvas("c9","c9",700,500);
+    //hpxpy->Draw("colz");
+    
 
-    TH1F *h_mean = new TH1F("h_mean", "; Run Number; mean", 17345, 324310.5, 341655.5);
+    TH1F *h_mean = new TH1F("h_mean", "; Run Number; mean",12813, 298760.5, 311573.5);
     TH1F *h_meanmean = new TH1F("h_meanmean", "; Run Number; mean", 100, 0, 1000);
     vector<Double_t> x,y,xe,ye;
     vector<Double_t> xc,yc,xec,yec;
     const int n = hpxpy->GetNbinsX()+1;
     float bi = 0;
 
-    TH1D *pjone = hpxpy->ProjectionY("projectiony",17000,17000);
-    TCanvas *c9 = new TCanvas("c9","c9",700,500);
-    pjone->Draw("hist");
-
-    return;
+    TH1D *pjone = hpxpy->ProjectionY("projectiony",10000,10000);
 
     float sigma2 = 0.;
     float sigma2x = 0.;
     float mean = 0.;
     float sigma = 0.;
-    std::cout << "start loop" << std::endl;
-    std::cout << "n " << n << std::endl;
     for (int i=0; i< n; i++){
         float meanx = 0.;
         float sigmax = 0.;
-        bi = i + 324310.0;   
+        bi = i + 298760.0;   
         TH1D *pj = hpxpy->ProjectionY("projectiony",i,i);
         TH1D *pjc = hpxpyC->ProjectionY("projectionyC",i,i);
         int num = 0;
         num = pj->GetBinContent(i);
-        if(num != 0){
-            std::cout << "i " << i << std::endl;
-            std::cout << "num " << num << std::endl;
-        }
-
         if(pj->GetMean() != 0.0) {
             if(pj->GetMean() <= 0.5) continue;
             if(pjc->GetMean() <= 0.5) continue;
-            //h_mean->SetBinContent(i,pj->GetMean());
+            h_mean->SetBinContent(i,pj->GetMean());
+            //if(pj->GetEntries() == 21328) {
+            //    cout << "bingo " << i << endl;
+            //}
             x.push_back(bi);
             xc.push_back(bi);
             y.push_back(pj->GetMean());
@@ -97,12 +96,10 @@ void getmean17() {
             sigma2x += meanx/(sigmax*sigmax);
         }
     }
-    std::cout << "finished loop" << std::endl;
-
     mean = sigma2x/sigma2;
     sigma = sqrt(1/sigma2); 
-    //cout << "mean = " << mean <<endl;
-    //cout << "sigma = " << sigma <<endl;
+    cout << "mean = " << mean <<endl;
+    cout << "sigma = " << sigma <<endl;
 
     Double_t* xpointer=&(x.at(0));
     Double_t* ypointer=&(y.at(0));
@@ -178,11 +175,11 @@ void getmean17() {
     h_mean->SetMarkerSize(0.3);
     */
 
-    //TCanvas *c0 = new TCanvas("c0","c0",700,500);
-    //tg->Draw("AP");
+    TCanvas *c0 = new TCanvas("c0","c0",700,500);
+    tg->Draw("AP");
     //c0->Print("testA.pdf");
     TCanvas *c4 = new TCanvas("c4","c4",700,500);
-    //tgc->Draw("AP");
+    tgc->Draw("AP");
     //c4->Print("testC.pdf");
     //TCanvas *c6 = new TCanvas("c6","c6",700,500);
     //proj->SetLineColor(3);

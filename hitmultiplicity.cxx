@@ -1,5 +1,8 @@
 int hitmultiplicity(){
-    string finname = "../data/output17.root";
+    //string finname = "../data/output17.root";
+    string finname = "../data/merged_17_4.root";
+    //string finname = "../data/merged_18_1003_2.root";
+
     //file open
     TFile* fin = TFile::Open(finname.c_str(), "READ");
     if (!fin) {
@@ -15,6 +18,8 @@ int hitmultiplicity(){
     TH1F *triggerAC = (TH1F*)fin->Get("eventsACwoPV"); 
     TH1F *triggerCA = (TH1F*)fin->Get("eventsCAwoPV"); 
 
+    double firstrun = 324310;  //17
+    //double firstrun = 348150; 
     //calc multiplicity
     vector<Double_t> x,y,xe,ye;
     vector<Double_t> x2,y2,xe2,ye2;
@@ -36,11 +41,11 @@ int hitmultiplicity(){
         nhitCAe = TMath::Sqrt(TMath::Power(hitCAA->ProjectionY("projXACA",i,i)->GetMeanError(),2)
                       +TMath::Power(hitCAC->ProjectionY("projXACC",i,i)->GetMeanError(),2));
         if ( nhitAC>1){
-            x.push_back(i);
+            x.push_back(firstrun+i);
             y.push_back(nhitAC);
             xe.push_back(0.);
             ye.push_back(nhitACe);
-            x2.push_back(i);
+            x2.push_back(firstrun+i);
             y2.push_back(nhitCA);
             xe2.push_back(0.);
             ye2.push_back(nhitCAe);
@@ -57,8 +62,8 @@ int hitmultiplicity(){
     Double_t* xepointer2=&(xe2.at(0));
     Double_t* yepointer2=&(ye2.at(0));
 
-    Double_t xlo = 0.;    // x の下限
-    Double_t xhi = 550.;   // x の上限
+    Double_t xlo = 0.+firstrun;    // x の下限
+    Double_t xhi = n+firstrun;   // x の上限
     Double_t ylo = 0.;    // y の下限
     Double_t yhi = 2500.;   // y の上限
     TCanvas *c1 = new TCanvas("c1","c1",700,500);
@@ -86,7 +91,7 @@ int hitmultiplicity(){
 
     tg->Draw("P");
     tg2->Draw("P");
-    frame->SetTitle(";LumiBlock;average hit multiplicity in pixel EndCaps");
+    frame->SetTitle(";Run Number;average hit multiplicity in pixel EndCaps");
     frame->GetYaxis()->SetTitleOffset(1.2);
 
     TLegend *leg = new TLegend(0.7,0.7,0.9,0.9);
